@@ -1,0 +1,34 @@
+var mongodb = require('mongodb')
+var mongoDbQueue = require('mongodb-queue')
+var mongoose = require("mongoose")
+const http = require('http');
+
+const hostname = '127.0.0.1';
+const port = 3000;
+module.exports = {
+    url: 'mongodb://localhost:27017/Alerts',
+    user: 'admin',
+    pwd: 'admin'
+}
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  res.end('Hello World');
+});
+
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+  const url = 'mongodb://localhost:27017/'
+const client = new mongodb.MongoClient(url, { useNewUrlParser: true })
+  
+client.connect(err => {
+    const db = client.db('test')
+    const queue = mongoDbQueue(db, 'my-queue')
+  
+    queue.add('Hello, World!', (err, id) => {
+        // Message with payload 'Hello, World!' added.
+        // 'id' is returned, useful for logging.
+    });
+  
+  })
+});
